@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户注册</title>
+    <style>
+        #example{
+            margin:auto;
+            width:400px;
+            background: #ccc;
+            opacity: 0.5;
+            padding-bottom: 30px;
+        }
+        h2{
+            text-align: center;
+            height:50px;
+            line-height: 50px;
+        }
+        .info{
+            margin-left: 20%;
+            height:50px;
+
+        }
+        button{
+            margin-left: 35%;
+            width:50px;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="example"></div>
+<script type="text/javascript" src="js/react.development.js"></script>
+<script type="text/javascript" src="js/react-dom.development.js"></script>
+<script type="text/javascript" src="js/babel.min.js"></script>
+<script type="text/babel">
+
+    //获取项目的url路径
+    function getPath(){
+        //地址栏url
+        const url = window.document.location.href
+        //获取地址栏不带参数的uri
+        const uri = window.document.location.pathname
+        //获取uri在url中的位置
+        const index = url.indexOf(uri)
+        //获取项目名
+        const projectName = "/" + uri.substr(1).split("/")[0] + "/"
+        //获取真正的路径
+        const pathName = url.substring(0,index) + projectName
+        return pathName
+    }
+    class Regist extends React.Component{
+        constructor(props){
+            super(props)
+            this.state = {
+                userName:"",
+                passwrod:"",
+                sex:"",
+                phone:"",
+                email:""
+            }
+            this.submit = this.submit.bind(this)
+        }
+        submit(event){
+            const userName = this.userName.value
+            const password = this.passowrd.value
+            const phone = this.cellphone.value
+            const email = this.email.value
+            if(userName==""){
+                alert("用户名不能为空")
+
+                return false
+            }
+            if(password==""){
+                alert("密码不能为空")
+
+                return false
+            }
+            if(phone==""){
+                alert("手机号不能为空")
+
+                return false
+            }
+            if(email==""){
+                alert("邮箱不能为空")
+
+                return false
+            }
+            const emailReg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
+            if(!emailReg.test(email)){
+                alert("邮箱格式不正确");
+
+                return false;
+            }
+            const phoneReg=/^[1][3,4,5,7,8][0-9]{9}$/;
+            if(!phoneReg.test(phone)){
+                alert("电话号码格式不正确！");
+
+                return false;
+            }
+            const user = {
+                user_name:userName,
+                password:password,
+                cellphone:phone,
+                email:email
+            }
+
+            const path = getPath()
+            const url = path + "regist"
+            fetch(url, {
+                method: 'POST', // or 'PUT'
+                body: JSON.stringify(user), // data can be `string` or {object}!
+                headers: new Headers({
+                    'Content-Type': 'application/json'
+                })
+            }).then(response => response.json())
+                .then(response => {
+                    if(response.info=="注册成功"){
+                        alert("注册成功")
+                        window.location.href=path + "login.html"
+                    }else{
+                        alert(response.info)
+                    }
+                    console.log(response)
+                })
+                .catch(error => console.log("Oops, error", error))
+
+            //阻止默认提交
+            event.preventDefault()
+        }
+
+        render(){
+            return (
+                <form onSubmit={this.submit}>
+                    <h2>用户注册</h2>
+                    <div className="info">
+                        <label>姓名：</label>
+                        <input type="text" className="user_name" ref={input =>this.userName = input} placeholder="请输入用户名"/>
+                    </div>
+                    <div className="info">
+                        <label>密码：</label>
+                        <input type="password" className="password" ref={input =>this.passowrd = input} placeholder="请输入密码"/>
+                    </div>
+                    <div className="info">
+                        <label>手机：</label>
+                        <input type="text" className="cellphone" ref={input =>this.cellphone = input} placeholder="请输入手机号" />
+                    </div>
+                    <div className="info">
+                        <label>邮箱：</label>
+                        <input type="text" className="email" ref={input =>this.email = input} placeholder="请输入邮箱"/>
+                    </div>
+                    <button type="submit"> 注册 </button>
+
+                </form>
+            )
+        }
+    }
+
+    ReactDOM.render(<Regist/>,document.getElementById("example"))
+</script>
+</body>
+</html>

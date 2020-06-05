@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户登录表</title>
+    <style>
+        #example1{
+            margin:auto;
+            width:600px;
+
+        }
+        table{
+            width:600px;
+            border: 1px solid;
+            border-collapse: collapse;
+
+        }
+        table thead th {
+            height:40px;
+            line-height: 40px;
+            background: #eee;
+        }
+        table tbody td {
+            height:40px;
+            line-height: 40px;
+            text-align:center;
+        }
+        table tbody tr:nth-child(even){
+            background: #fff8dc;
+        }
+        table tbody tr:hover{
+            background: bisque;
+        }
+    </style>
+</head>
+<body>
+
+<div id="example1"></div>
+<script type="text/javascript" src="js/react.development.js"></script>
+<script type="text/javascript" src="js/react-dom.development.js"></script>
+<script type="text/javascript" src="js/prop-types.js"></script>
+<script type="text/javascript" src="js/babel.min.js"></script>
+<script type="text/babel">
+
+
+    //获取项目的url路径
+    function getPath(){
+        //地址栏url
+        const url = window.document.location.href
+        //获取地址栏不带参数的uri
+        const uri = window.document.location.pathname
+        //获取uri在url中的位置
+        const index = url.indexOf(uri)
+        //获取项目名
+        const projectName = "/" + uri.substr(1).split("/")[0] + "/"
+        //获取真正的路径
+        const pathName = url.substring(0,index) + projectName
+        return pathName
+    }
+
+    class UserLoginList extends  React.Component{
+        constructor(props){
+            super(props)
+            this.state = {
+                loginList:[]
+            }
+        }
+        componentWillMount() {
+            var path=getPath()
+            var url = path+"getAllLoginLog"
+            alert(url)
+            fetch(url, {
+                meoth: "POST",
+                headers: new Headers({
+                    'Content-Type': 'application/json'
+                })
+            }).then(response => response.json())
+                .catch(error => console.error("Error", error))
+                .then(response => {
+                    alert(response)
+                    this.setState({loginList: response})
+                })
+        }
+        render(){
+            return (
+                <table>
+                    <caption>用户登录记录表</caption>
+                    <thead><th>用户名</th><th>登录时间</th><th>登录IP地址</th></thead>
+                    <tbody>
+                    {
+                        this.state.loginList.map((log,index) =>
+                        {
+                            return(
+                            <tr key={index}>
+                                <td >{log.user_name}</td>
+                                <td >{log.login_time}</td>
+                                <td >{log.login_ip}</td>
+                            </tr>
+                            )}
+                        )
+                    }
+                    </tbody>
+                </table>
+            )
+        }
+    }
+    ReactDOM.render(<UserLoginList/>,document.getElementById("example1"))
+</script>
+</body>
+</html>
